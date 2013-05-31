@@ -29,6 +29,7 @@
 			} else {
 				$data = (object) array(
 					"numOfTables" => 0,
+					"database" => $dbname,
 					"tables" => (object) array()
 				);
 				// getting tables
