@@ -66,6 +66,9 @@
 			}
 		} else {
 			$error = '<div class="alert alert-error">Missing data!</div>';
+			$content = view("tpl/export-form.html", array(
+				"error" => $error
+			));
 		}
 	} else {
 		$content = view("tpl/export-form.html", array(
