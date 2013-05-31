@@ -6,10 +6,13 @@
 	$error = '';
 	$content = '';
 	$allTableNames = (object) array();
+	$data1Content = '{}';
+	$data2Content = '{}';
 
 	// helper methods
-	function getJSON($file) {
-		return json_decode(file_get_contents($file));
+	function getJSON($file, &$var) {
+		$fileContent = $var = file_get_contents($file);
+		return json_decode($fileContent);
 	}
 	function formatAsTable($title, $rows) {
 		$markup = '';
@@ -22,11 +25,19 @@
 		$markup .= '</table>';
 		return $markup;
 	}
-	function columns($arr) {
+	function headers($arr) {
 		$markup = '<tr>';
 		$numOfColumns = count($arr);
 		for ($i=0; $i < $numOfColumns; $i++) { 
 			$markup .= '<th>'.$arr[$i].'</th>';
+		}
+		return $markup.'</tr>';
+	}
+	function row($arr) {
+		$markup = '<tr>';
+		$numOfColumns = count($arr);
+		for ($i=0; $i < $numOfColumns; $i++) { 
+			$markup .= '<td>'.$arr[$i].'</td>';
 		}
 		return $markup.'</tr>';
 	}
@@ -52,11 +63,19 @@
 			</tr>
 		';
 	}
+	function getTablesNamesDropDown() {
+		global $allTableNames;
+		$markup = '';
+		foreach ($allTableNames as $name => $value) {
+			$markup .= '<option value="'.$name.'">'.$name.'</option>';
+		}
+		return $markup;
+	}
 
 	// diffs
 	function main($d1, $d2) {
 		return formatAsTable('Main', array(
-			columns(array('', $d1->database, $d2->database)),
+			headers(array('', $d1->database, $d2->database)),
 			equal("Num of tables", $d1->numOfTables, $d2->numOfTables)
 		));
 	}
@@ -73,7 +92,7 @@
 			array_push($rows, equalKeyInObject($name, $d1->tables, $d2->tables));
 		}
 		return formatAsTable('Tables', array_merge(
-			array(columns(array('', $d1->database, $d2->database))),
+			array(headers(array('', $d1->database, $d2->database))),
 			$rows
 		));
 	}
@@ -93,11 +112,12 @@
 				}
 				$rows = array();
 				array_push($rows, equal("Number of records", count($table1->values), count($table2->values)));
+				array_push($rows, row(array('Fields', '', '')));
 				foreach($allFields as $fieldName => $value) {
 					array_push($rows, equalKeyInObject($fieldName, $table1->fields, $table2->fields));
 				}
 				$markup .= formatAsTable('Table: '.$name, array_merge(
-					array(columns(array('', $d1->database, $d2->database))),
+					array(headers(array('', $d1->database, $d2->database))),
 					$rows
 				));
 			}
@@ -107,11 +127,19 @@
 
 	if($submitted) {
 		if(isset($_FILES) && $_FILES["file1"] && $_FILES["file2"] && $_FILES["file1"]["name"] !== "" && $_FILES["file2"]["name"] !== "") {
-			$data1 = getJSON($_FILES["file1"]["tmp_name"]);
-			$data2 = getJSON($_FILES["file2"]["tmp_name"]);
-			$content .= main($data1, $data2);
-			$content .= tables($data1, $data2);
-			$content .= tablesFormat($data1, $data2);
+			$data1 = getJSON($_FILES["file1"]["tmp_name"], $data1Content);
+			$data2 = getJSON($_FILES["file2"]["tmp_name"], $data2Content);
+			$main = main($data1, $data2);
+			$tables = tables($data1, $data2);
+			$tablesFormat = tablesFormat($data1, $data2);
+			$content .= view("tpl/compare-form-actions.html", array(
+				"compareValuesTables" => getTablesNamesDropDown()
+			));
+			$content .= '<div id="diffs">';
+			$content .= $main;
+			$content .= $tables;
+			$content .= $tablesFormat;
+			$content .= '</div>';
 		} else {
 			$error = '<div class="alert alert-error">Please choose files!</div>';
 			$content = view("tpl/compare-form.html", array(
@@ -125,7 +153,9 @@
 	}
 
 	echo view("tpl/layout.html", array(
-		"content" => $content
+		"content" => $content,
+		"d1" => $data1Content,
+		"d2" => $data2Content
 	));
 
 ?>

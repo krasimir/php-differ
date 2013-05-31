@@ -19,6 +19,10 @@
         	tr.yes {
         		background: #C1FDC5;
         	}
+        	tr.yes:hover {
+        		background: #4785AD;
+        		color: #FFF;
+        	}
         	tr.no {
         		background: #F00;
         		color: #FFF;
@@ -29,11 +33,16 @@
         		font-size: 11px;
         	}
         </style>
+        <script type="text/javascript" src="js/jquery-1.10.1.min.js"></script>
+        <script type="text/javascript" src="js/values.js"></script>
+        <script type="text/javascript">
+        	var d1 = {d1};
+        	var d2 = {d2};
+        </script>
 		
 	</head>
 	<body class="main">
 		
-		<div class="container">
 			<h1>PHP Differ</h1>
 			<hr />
 			<ul class="nav nav-tabs">
@@ -41,7 +50,10 @@
 				<li><a href="compare.php">Compare</a></li>
 			</ul>
 			{content}
-		</div>
+			
+			<div id="values">
+				
+			</div>
 
 	</body>
 </html>

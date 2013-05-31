@@ -1,3 +1,57 @@
 <script type="text/javascript">
 
+	var showOnlyDiffs = function() {
+		$("#view-all").removeClass("disabled");
+		$("#show-only-diffs").addClass("disabled");
+		var tables = $("table");
+		for(var i=0; i<tables.length; i++) {
+			var table = tables.eq(i);
+			var trs = table.find("tr");
+			var hide = true;
+			for(var j=0; j<trs.length; j++) {
+				if(trs.eq(j).hasClass("no")) hide = false;
+			}
+			if(hide) table.css("display", "none");
+		}
+	}
+	var showAll = function() {
+		$("#view-all").addClass("disabled");
+		$("#show-only-diffs").removeClass("disabled");
+		var tables = $("table");
+		for(var i=0; i<tables.length; i++) {
+			var table = tables.eq(i);
+			table.css("display", "table");
+		}
+	}
+
+	$(document).ready(function() {
+		showOnlyDiffs();
+
+		// values check
+		var diffs = $("#diffs");
+		var values = $("#values");
+		$("#compare-values").on("change", function() {
+			var value = $(this).val();
+			if(value == "off") {
+				diffs.css("display", "block");
+				values.css("display", "none");
+			} else {
+				diffs.css("display", "none");
+				values.css("display", "block");
+				values.html(ValuesDiffs.get(d1, d2, value));
+			}
+		});
+
+	});
 </script>
+<ul class="nav nav-pills">
+	<li class="pull-right">
+		Compare table values:<br />
+		<select id="compare-values">			
+			<option value="off">none</option>
+			{compareValuesTables}
+		</select>
+	</li>
+	<li id="view-all"><a href="javascript:showAll();">View All</a></li>
+	<li id="show-only-diffs"><a href="javascript:showOnlyDiffs();">Show only diffs</a></li>
+</ul>
