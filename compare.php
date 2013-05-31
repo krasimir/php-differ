@@ -13,8 +13,8 @@
 	}
 	function formatAsTable($title, $rows) {
 		$markup = '';
-		$markup .= '<h2>'.$title.'</h2>';
 		$markup .= '<table class="table table-bordered">';
+		$markup .= '<tr><td colspan="10"><h2>'.$title.'</h2></td></tr>';
 		$numOfRows = count($rows);
 		for ($i=0; $i < $numOfRows; $i++) { 
 			$markup .= $rows[$i];
@@ -70,7 +70,7 @@
 		}
 		$rows = array();
 		foreach($allTableNames as $name => $value) {
-			array_push($rows, equalKeyInObject($name, $d1->tables, $d2->tables, true));
+			array_push($rows, equalKeyInObject($name, $d1->tables, $d2->tables));
 		}
 		return formatAsTable('Tables', array_merge(
 			array(columns(array('', $d1->database, $d2->database))),
@@ -92,8 +92,9 @@
 					if(!isset($allFields->$fieldName)) $allFields->$fieldName = 'check';
 				}
 				$rows = array();
+				array_push($rows, equal("Number of records", count($table1->values), count($table2->values)));
 				foreach($allFields as $fieldName => $value) {
-					array_push($rows, equalKeyInObject($fieldName, $table1->fields, $table2->fields, false));
+					array_push($rows, equalKeyInObject($fieldName, $table1->fields, $table2->fields));
 				}
 				$markup .= formatAsTable('Table: '.$name, array_merge(
 					array(columns(array('', $d1->database, $d2->database))),
