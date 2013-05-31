@@ -1,4 +1,4 @@
-php-differ
+PHP Differ
 ==========
 
-Showing differences between two mysql databases
+Showing differences between two mysql databases.
